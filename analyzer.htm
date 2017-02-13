@@ -1,7 +1,7 @@
 <html>
 <head>
  <script src='js/jquery-3.1.1.js'></script>
- <script src='js/jquery.csv.js'></script>
+ <script src='js/csv.js'></script>
 </head>
 <body></body>
 
@@ -13,8 +13,13 @@ $.get('log.txt', runProgram, dataType='text');
 function runProgram(logData) {
     $('body').css('background-color', '#ffff00');
 
+    var dataset = new CSV(logData, {
+        header: true,
+        cellDelimiter: '\t',
+        cast: false
+    }).parse();
 
-    $('body').html(logData);
+    console.log(dataset);
 }
 
 
