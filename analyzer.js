@@ -19,7 +19,11 @@ function runProgram(logData) {
     $('body').css('background-color', '#ffff00');
 
     var dataset = readRunningAheadTSV(logData);
-    transformDataset(dataset);
+    var newDataset = transformDataset(dataset);
+
+    var summer2011Dataset = filterRowsByDate(newDataset, '2011-06-01', '2011-10-01');
+
+    console.log(summer2011Dataset);
 }
 
 
@@ -33,28 +37,56 @@ function readRunningAheadTSV(tsvString) {
 
 
 function transformDataset(dataset) {
-    dataset.forEach(transformRow);
+    var newDataset = [];
+    for (var i = 0; i < dataset.length; i++) {
+        newDataset.push(transformRow(dataset[i]));
+    }
+
+    return newDataset;
 }
 
-function transformRow(row) {
+
+// Return rows filtered where Date is within [startDate, endDate]
+function filterRowsByDate(rows, startDate, endDate) {
+    return rows.filter(function (row) {
+        var onOrAfterStart = row.Date.isSame(startDate, 'day') || row.Date.isAfter(startDate);
+        var onOrBeforeEnd = row.Date.isSame(endDate, 'day') || row.Date.isBefore(endDate);
+
+        return onOrAfterStart && onOrBeforeEnd;
+    });
+}
+
+
+function transformRow(originalRow) {
+    // Shallow copy original row
+    var newRow = $.extend({}, originalRow);
+
     // Duration in minutes
-    var durationText = row[OriginalHeaders.Duration];
+    var durationText = newRow[OriginalHeaders.Duration];
     if (durationText && durationText.length > 0) {
         var momentDuration = moment.duration(durationText);
-        row[AddedHeaders.DurationMinutes] = momentDuration.asMinutes();
+        newRow[AddedHeaders.DurationMinutes] = momentDuration.asMinutes();
     }
 
     // Distance in miles
-    var distText = row[OriginalHeaders.Distance];
-    var distUnitText = row[OriginalHeaders.DistanceUnit];
+    var distText = newRow[OriginalHeaders.Distance];
+    var distUnitText = newRow[OriginalHeaders.DistanceUnit];
     if (distText && distText.length > 0 && distUnitText && distUnitText.length) {
         var origDist = parseFloat(distText);
 
         if (distUnitText === DistanceUnits.Mile) {
-            row[AddedHeaders.DistanceMiles] = origDist;
+            newRow[AddedHeaders.DistanceMiles] = origDist;
         } else if (distUnitText === DistanceUnits.Kilometer) {
             var distInMiles = Qty(origDist + ' km').to('mi').scalar;
-            row[AddedHeaders.DistanceMiles] = distInMiles;
+            newRow[AddedHeaders.DistanceMiles] = distInMiles;
         }
     }
+
+    // Date as JS moment (Replace Date column)
+    var dateText = newRow[OriginalHeaders.Date];
+    if (dateText && dateText.length > 0) {
+        newRow[OriginalHeaders.Date] = moment(dateText, 'YYYY-MM-DD')
+    }
+
+    return newRow;
 }
