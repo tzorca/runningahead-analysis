@@ -107,6 +107,9 @@ function calculateStatsForPeriod(rows, startDate, endDate) {
     // Average hours per week
     stats.avgHoursPerWeek = stats.totalHours / stats.daysInPeriod * 7;
 
+    // Average pace (minutes per mile)
+    stats.avgPace = (stats.totalHours * 60) / stats.totalMiles;
+
     return stats;
 }
 
