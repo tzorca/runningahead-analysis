@@ -88,6 +88,9 @@ function calculateStatsForPeriod(rows, startDate, endDate) {
         };
     }, 0);
 
+    // Average miles per week
+    stats.avgMilesPerWeek = stats.totalMiles / stats.daysInPeriod * 7;
+
     return stats;
 }
 
