@@ -20,18 +20,21 @@ var ActivityTypes = {
 
 
 function runProgram(logData) {
-    $('body').css('background-color', '#ffff00');
+    $('body').css('background-color', '#aaccff');
 
     var dataset = readRunningAheadTSV(logData);
     var tDataset = transformDataset(dataset);
 
     // Just look at runs
-    var tRunsDataset = tDataset.filter(       function(row) {
-            return row[OriginalHeaders.Type] === ActivityTypes.Run;
-        });
+    var tRunsDataset = tDataset.filter(function(row) {
+        return row[OriginalHeaders.Type] === ActivityTypes.Run;
+    });
 
-    var summer2011Stats = calculateStatsForPeriod(tRunsDataset, '2011-06-01', '2011-10-01');
-    console.log(summer2011Stats);
+    // Calculate stats
+    var mid2011Stats = calculateStatsForPeriod(tRunsDataset, '2011-03-15', '2011-09-15');
+
+    // Show stats on page
+    $('#output').text(JSON.stringify(mid2011Stats, null, 2));
 }
 
 
@@ -58,6 +61,10 @@ function calculateStatsForPeriod(rows, startDate, endDate) {
     var pRows = filterRowsByDate(rows, startDate, endDate);
 
     var stats = {};
+
+    // Start and end date
+    stats.startDate = startDate;
+    stats.endDate = endDate;
 
     // Days in period
     stats.daysInPeriod = moment(endDate)
