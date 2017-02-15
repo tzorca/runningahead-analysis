@@ -51,18 +51,25 @@ function calculateStatsForPeriod(rows, startDate, endDate) {
 
     var stats = {};
 
-    stats.periodDays = moment(endDate)
+    // Days in period
+    stats.daysInPeriod = moment(endDate)
         .diff(moment(startDate), 'days');
 
+    // Total runs
     stats.totalRuns = pRows.length;
 
     var runsByDate = _.groupBy(pRows, function (row) {
         return row.Date;
     });
-    console.log(runsByDate);
+
+    // Total days run
     stats.totalDaysRun = Object.keys(runsByDate).length;
 
-    stats.avgDaysPerWeekRun = (stats.totalDaysRun / stats.periodDays) * 7;
+    // Average days run per week
+    stats.avgDaysRunPerWeek = (stats.totalDaysRun / stats.daysInPeriod) * 7;
+
+    // Average runs per day run
+    stats.avgsRunsPerDayRun = stats.totalRuns / stats.totalDaysRun;
 
     return stats;
 }
