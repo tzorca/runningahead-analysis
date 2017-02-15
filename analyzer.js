@@ -19,11 +19,11 @@ function runProgram(logData) {
     $('body').css('background-color', '#ffff00');
 
     var dataset = readRunningAheadTSV(logData);
-    var newDataset = transformDataset(dataset);
+    var tDataset = transformDataset(dataset);
 
-    var summer2011Dataset = filterRowsByDate(newDataset, '2011-06-01', '2011-10-01');
 
-    console.log(summer2011Dataset);
+    var summer2011Stats = calculateStatsForPeriod(tDataset, '2011-06-01', '2011-10-01');
+    console.log(summer2011Stats);
 }
 
 
@@ -46,7 +46,29 @@ function transformDataset(dataset) {
 }
 
 
-// Return rows filtered where Date is within [startDate, endDate]
+function calculateStatsForPeriod(rows, startDate, endDate) {
+    var pRows = filterRowsByDate(rows, startDate, endDate);
+
+    var stats = {};
+
+    stats.periodDays = moment(endDate)
+        .diff(moment(startDate), 'days');
+
+    stats.totalRuns = pRows.length;
+
+    var runsByDate = _.groupBy(pRows, function (row) {
+        return row.Date;
+    });
+    console.log(runsByDate);
+    stats.totalDaysRun = Object.keys(runsByDate).length;
+
+    stats.avgDaysPerWeekRun = (stats.totalDaysRun / stats.periodDays) * 7;
+
+    return stats;
+}
+
+
+// Return filtered rows where Date is within [startDate, endDate]
 function filterRowsByDate(rows, startDate, endDate) {
     return rows.filter(function (row) {
         var onOrAfterStart = row.Date.isSame(startDate, 'day') || row.Date.isAfter(startDate);
