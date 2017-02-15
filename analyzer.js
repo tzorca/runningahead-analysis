@@ -91,6 +91,9 @@ function calculateStatsForPeriod(rows, startDate, endDate) {
     // Average miles per week
     stats.avgMilesPerWeek = stats.totalMiles / stats.daysInPeriod * 7;
 
+    // Average distance per day run
+    stats.avgDistPerDayRun = stats.totalMiles / stats.totalDaysRun;
+
     return stats;
 }
 
