@@ -5,8 +5,8 @@ var OriginalHeaders = {
 };
 
 var AddedHeaders = {
-    DurationMinutes: 'DurationMinutes',
-    DistanceMiles: 'DistanceMiles'
+    DurationInMinutes: 'DurationInMinutes',
+    DistanceInMiles: 'DistanceInMiles'
 };
 
 var DistanceUnits = {
@@ -14,6 +14,9 @@ var DistanceUnits = {
     Kilometer: "Kilometer"
 };
 
+var ActivityTypes = {
+    Run: "Run"
+};
 
 function runProgram(logData) {
     $('body').css('background-color', '#ffff00');
@@ -21,8 +24,12 @@ function runProgram(logData) {
     var dataset = readRunningAheadTSV(logData);
     var tDataset = transformDataset(dataset);
 
+    // Just look at runs
+    var tRunsDataset = tDataset.filter(       function(row) {
+            return row[OriginalHeaders.Type] === ActivityTypes.Run;
+        });
 
-    var summer2011Stats = calculateStatsForPeriod(tDataset, '2011-06-01', '2011-10-01');
+    var summer2011Stats = calculateStatsForPeriod(tRunsDataset, '2011-06-01', '2011-10-01');
     console.log(summer2011Stats);
 }
 
@@ -71,6 +78,16 @@ function calculateStatsForPeriod(rows, startDate, endDate) {
     // Average runs per day run
     stats.avgsRunsPerDayRun = stats.totalRuns / stats.totalDaysRun;
 
+    // Total miles
+    stats.totalMiles = _.reduce(pRows, function (previous, row) {
+        var rowDistInMiles = row[AddedHeaders.DistanceInMiles];
+        if (rowDistInMiles) {
+            return previous + rowDistInMiles;
+        } else {
+            return previous
+        };
+    }, 0);
+
     return stats;
 }
 
@@ -94,7 +111,7 @@ function transformRow(originalRow) {
     var durationText = newRow[OriginalHeaders.Duration];
     if (durationText && durationText.length > 0) {
         var momentDuration = moment.duration(durationText);
-        newRow[AddedHeaders.DurationMinutes] = momentDuration.asMinutes();
+        newRow[AddedHeaders.DurationInMinutes] = momentDuration.asMinutes();
     }
 
     // Distance in miles
@@ -104,10 +121,10 @@ function transformRow(originalRow) {
         var origDist = parseFloat(distText);
 
         if (distUnitText === DistanceUnits.Mile) {
-            newRow[AddedHeaders.DistanceMiles] = origDist;
+            newRow[AddedHeaders.DistanceInMiles] = origDist;
         } else if (distUnitText === DistanceUnits.Kilometer) {
             var distInMiles = Qty(origDist + ' km').to('mi').scalar;
-            newRow[AddedHeaders.DistanceMiles] = distInMiles;
+            newRow[AddedHeaders.DistanceInMiles] = distInMiles;
         }
     }
 
