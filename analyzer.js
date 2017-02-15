@@ -18,6 +18,7 @@ var ActivityTypes = {
     Run: "Run"
 };
 
+
 function runProgram(logData) {
     $('body').css('background-color', '#ffff00');
 
@@ -95,6 +96,31 @@ function calculateStatsForPeriod(rows, startDate, endDate) {
 
     // Average pace (minutes per mile)
     stats.avgPace = (stats.totalHours * 60) / stats.totalMiles;
+
+    var runsWithNotes = pRows.filter(function(row) {
+        return row[OriginalHeaders.Notes] && row[OriginalHeaders.Notes].length > 0;
+    });
+
+    // Total runs with notes
+    stats.totalRunsWithNotes = runsWithNotes.length;
+
+    // Total note length
+    stats.totalNoteLength = _.reduce(runsWithNotes, function(previous, row) {
+        return previous + row[OriginalHeaders.Notes].length;
+    }, 0); 
+
+    // Average note length
+    stats.avgNoteLength = stats.totalNoteLength / stats.totalRunsWithNotes;
+    
+    var runsWithNotesByDate = _.groupBy(runsWithNotes, function (row) {
+        return row.Date;
+    });
+
+    // Total days with notes
+    stats.totalDaysWithNotes = Object.keys(runsWithNotesByDate).length;
+
+    // Percent of days with notes
+    stats.percentOfDaysWithNotes = stats.totalDaysWithNotes / stats.daysInPeriod;
 
     return stats;
 }
