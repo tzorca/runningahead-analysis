@@ -79,14 +79,7 @@ function calculateStatsForPeriod(rows, startDate, endDate) {
     stats.avgsRunsPerDayRun = stats.totalRuns / stats.totalDaysRun;
 
     // Total miles
-    stats.totalMiles = _.reduce(pRows, function (previous, row) {
-        var rowDistInMiles = row[AddedHeaders.DistanceInMiles];
-        if (rowDistInMiles) {
-            return previous + rowDistInMiles;
-        } else {
-            return previous
-        };
-    }, 0);
+    stats.totalMiles = sumByKeyInObject(pRows, AddedHeaders.DistanceInMiles);
 
     // Average miles per week
     stats.avgMilesPerWeek = stats.totalMiles / stats.daysInPeriod * 7;
@@ -95,14 +88,7 @@ function calculateStatsForPeriod(rows, startDate, endDate) {
     stats.avgDistPerDayRun = stats.totalMiles / stats.totalDaysRun;
 
     // Total hours running
-    stats.totalHours = _.reduce(pRows, function (previous, row) {
-        var duration = row[AddedHeaders.DurationInMinutes];
-        if (duration) {
-            return previous + duration;
-        } else {
-            return previous
-        };
-    }, 0) / 60;
+    stats.totalHours = sumByKeyInObject(pRows, AddedHeaders.DurationInMinutes) / 60;
 
     // Average hours per week
     stats.avgHoursPerWeek = stats.totalHours / stats.daysInPeriod * 7;
@@ -111,6 +97,19 @@ function calculateStatsForPeriod(rows, startDate, endDate) {
     stats.avgPace = (stats.totalHours * 60) / stats.totalMiles;
 
     return stats;
+}
+
+
+function sumByKeyInObject(array, key) {
+    return _.reduce(array,
+        function (previous, obj) {
+            var val = obj[key];
+            if (val) {
+                return previous + val;
+            } else {
+                return previous;
+            };
+    }, 0);
 }
 
 
