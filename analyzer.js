@@ -94,6 +94,19 @@ function calculateStatsForPeriod(rows, startDate, endDate) {
     // Average distance per day run
     stats.avgDistPerDayRun = stats.totalMiles / stats.totalDaysRun;
 
+    // Total hours running
+    stats.totalHours = _.reduce(pRows, function (previous, row) {
+        var duration = row[AddedHeaders.DurationInMinutes];
+        if (duration) {
+            return previous + duration;
+        } else {
+            return previous
+        };
+    }, 0) / 60;
+
+    // Average hours per week
+    stats.avgHoursPerWeek = stats.totalHours / stats.daysInPeriod * 7;
+
     return stats;
 }
 
