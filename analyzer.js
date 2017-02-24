@@ -1,5 +1,3 @@
-$.get('log.txt', runProgram, dataType='text');
-
 var OriginalHeaders = {
     Date: 'Date', TimeOfDay: 'TimeOfDay', Type: 'Type', SubType: 'SubType', Distance: 'Distance', DistanceUnit: 'DistanceUnit', Duration: 'Duration', Weight: 'Weight', WeightUnit: 'WeightUnit', RestHR: 'RestHR', AvgHR: 'AvgHR', MaxHR: 'MaxHR', Sleep: 'Sleep', Calories: 'Calories', Quality: 'Quality', Effort: 'Effort', Weather: 'Weather', Temperature: 'Temperature', TempUnit: 'TempUnit', Notes: 'Notes', Course: 'Course', CourseSurface: 'CourseSurface', CourseNotes: 'CourseNotes', ShoeMake: 'ShoeMake', ShoeModel: 'ShoeModel', Size: 'Size', System: 'System', ShoeSerial: 'ShoeSerial', ShoePrice: 'ShoePrice', OverallPlace: 'OverallPlace', FieldSize: 'FieldSize', GroupMinAge: 'GroupMinAge', GroupMaxAge: 'GroupMaxAge', GroupPlace: 'GroupPlace', GroupSize: 'GroupSize', GenderPlace: 'GenderPlace', GenderSize: 'GenderSize'
 };
@@ -9,15 +7,69 @@ var AddedHeaders = {
     DistanceInMiles: 'DistanceInMiles'
 };
 
+var ColumnDefs = [
+    {
+        data: OriginalHeaders.Date,
+        title: "Date",
+        render: function (data, type, row) {
+            return data.format('YYYY-MM-DD');
+        }
+    },
+    {
+        data: OriginalHeaders.TimeOfDay,
+        title: "Time",
+        render: function (data, type, row) {
+            if (data) {
+                return data.format('h:mm a');
+            } else {
+                return "";
+            }
+        }
+    },
+
+    {
+        data: OriginalHeaders.SubType,
+        title: "Sub Type"
+    },
+    {
+        data: AddedHeaders.DistanceInMiles,
+        title: "Distance (mi)",
+        render: renderTwoDecimalPlaces
+    },
+    {
+        data: AddedHeaders.DurationInMinutes,
+        title: "Duration",
+        render: function (minutes, type, row) {
+            if (minutes) {
+                var ms = minutes * 60 * 1000;
+                return moment.utc(ms).format('HH:mm:ss');
+            } else {
+                return "";
+            }
+        }
+    },
+    {
+        data: OriginalHeaders.Course,
+        title: "Course"
+    },
+    {
+        data: OriginalHeaders.Temperature,
+        title: "Temperature"
+    },
+];
+
 var DistanceUnits = {
-    Mile: "Mile",
-    Kilometer: "Kilometer"
+    Mile: 'Mile',
+    Kilometer: 'Kilometer'
 };
 
 var ActivityTypes = {
-    Run: "Run"
+    Run: 'Run'
 };
 
+$(document).ready(function(){
+    $.get('log.txt', runProgram, dataType='text');
+});
 
 function runProgram(logData) {
     $('body').css('background-color', '#aaccff');
@@ -29,6 +81,15 @@ function runProgram(logData) {
     var tRunsDataset = tDataset.filter(function(row) {
         return row[OriginalHeaders.Type] === ActivityTypes.Run;
     });
+
+
+    // Show log data in table
+    $('#logTable').DataTable({
+        data: tRunsDataset,
+        columns: ColumnDefs,
+        deferRender: true
+    });
+
 
     // Calculate stats
     var mid2011Stats = calculateStatsForPeriod(tRunsDataset, '2011-03-15', '2011-09-15');
@@ -188,5 +249,20 @@ function transformRow(originalRow) {
         newRow[OriginalHeaders.Date] = moment(dateText, 'YYYY-MM-DD')
     }
 
+    // Time as JS moment (Replace Time column)
+    var timeText = newRow[OriginalHeaders.TimeOfDay];
+    if (timeText && timeText.length > 0) {
+        newRow[OriginalHeaders.TimeOfDay] = moment(timeText, 'hh:mm a')
+    }
+
     return newRow;
+}
+
+
+function renderTwoDecimalPlaces(data, type, row) {
+    if (data) {
+        return parseFloat(data).toFixed(2);
+    } else {
+        return "";
+    }
 }
