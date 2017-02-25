@@ -6,60 +6,62 @@ var AddedHeaders = {
 var ColumnDefs = [
     {
         data: OriginalHeaders.Date,
-        title: "Date",
+        title: 'Date',
         render: function (data, type, row) {
             return data.format('YYYY-MM-DD');
         }
     },
     {
         data: OriginalHeaders.TimeOfDay,
-        title: "Time",
+        title: 'Time',
         render: function (data, type, row) {
             if (data) {
                 return data.format('h:mm a');
             } else {
-                return "";
+                return '';
             }
         }
     },
 
     {
         data: OriginalHeaders.SubType,
-        title: "Sub Type"
+        title: 'Sub Type'
     },
     {
         data: AddedHeaders.DistanceInMiles,
-        title: "Distance (mi)",
+        title: 'Distance (mi)',
         render: renderTwoDecimalPlaces
     },
     {
         data: AddedHeaders.DurationInMinutes,
-        title: "Duration",
+        title: 'Duration',
         render: function (minutes, type, row) {
             if (minutes) {
                 var ms = minutes * 60 * 1000;
                 return moment.utc(ms).format('HH:mm:ss');
             } else {
-                return "";
+                return '';
             }
         }
     },
     {
         data: OriginalHeaders.Course,
-        title: "Course"
+        title: 'Course'
     },
     {
         data: OriginalHeaders.Temperature,
-        title: "Temperature"
+        title: 'Temperature'
     },
 ];
 
 $(document).ready(function(){
     $.get('log.txt', runProgram, dataType='text');
+
+    $('#log-datepicker.input-daterange').datepicker({});
 });
 
 function runProgram(logData) {
-    $('body').css('background-color', '#aaccff');
+    $('body').css('background-color', '#eaeaea');
 
     var dataset = readRunningAheadTSV(logData);
     var tDataset = transformDataset(dataset);
@@ -74,7 +76,9 @@ function runProgram(logData) {
     $('#logTable').DataTable({
         data: tRunsDataset,
         columns: ColumnDefs,
-        deferRender: true
+        deferRender: true,
+        pageLength: 10,
+        dom: 'tifp'
     });
 
 
