@@ -1,88 +1,66 @@
-var AddedHeaders = {
-  DurationInMinutes: 'DurationInMinutes',
-  DistanceInMiles: 'DistanceInMiles'
+var analyzerApp = {
+  fullDataset: [],
+  runsDataset: [],
+  logDatatable: {}
 };
 
-var ColumnDefs = [{
-    data: OriginalHeaders.Date,
-    title: 'Date',
-    render: function(data, type, row) {
-      return data.format('YYYY-MM-DD');
-    }
-  }, {
-    data: OriginalHeaders.TimeOfDay,
-    title: 'Time',
-    render: function(data, type, row) {
-      if (data) {
-        return data.format('h:mm a');
-      } else {
-        return '';
-      }
-    }
-  },
-
-  {
-    data: OriginalHeaders.SubType,
-    title: 'Sub Type'
-  }, {
-    data: AddedHeaders.DistanceInMiles,
-    title: 'Distance (mi)',
-    render: renderTwoDecimalPlaces
-  }, {
-    data: AddedHeaders.DurationInMinutes,
-    title: 'Duration',
-    render: function(minutes, type, row) {
-      if (minutes) {
-        var ms = minutes * 60 * 1000;
-        return moment.utc(ms).format('HH:mm:ss');
-      } else {
-        return '';
-      }
-    }
-  }, {
-    data: OriginalHeaders.Course,
-    title: 'Course'
-  }, {
-    data: OriginalHeaders.Temperature,
-    title: 'Temperature'
-  },
-];
 
 $(document).ready(function() {
-  $.get('log.txt', runProgram, dataType = 'text');
-
-  $('#log-datepicker.input-daterange').datepicker({});
-});
-
-function runProgram(logData) {
-  $('body').css('background-color', '#eaeaea');
-
-  var dataset = readRunningAheadTSV(logData);
-  var tDataset = transformDataset(dataset);
-
-  // Just look at runs
-  var tRunsDataset = tDataset.filter(function(row) {
-    return row[OriginalHeaders.Type] === ActivityTypes.Run;
-  });
-
-
-  // Show log data in table
-  $('#logTable').DataTable({
-    data: tRunsDataset,
-    columns: ColumnDefs,
+  // Init log table
+  analyzerApp.logDatatable = $('#log-table').DataTable({
+    data: [],
+    columns: LogTableColumnDefs,
     deferRender: true,
     pageLength: 10,
     dom: 'tifp'
   });
 
+  // Get data, then reload table and stats
+  $.get('log.txt', function(logDataTSV) {
+    analyzerApp.fullDataset = transformDataset(readRunningAheadTSV(logDataTSV));
+    analyzerApp.runsDataset = analyzerApp.fullDataset.filter(function(row) {
+      return row[OriginalHeaders.Type] === ActivityTypes.Run;
+    });
+
+    reloadTableAndStats();
+  }, dataType = 'text');
+
+  // Add event handler to date picker range
+  $('#log-datepicker input').datepicker({})
+    .on('changeDate', function(e) {
+      reloadTableAndStats();
+    });
+});
+
+
+function reloadTableAndStats() {
+  // Determine start and end date
+  var startDate = $('#log-start-date').val() || getFirstDateInDataset(analyzerApp.runsDataset);
+  var endDate = $('#log-end-date').val() || getLastDateInDataset(analyzerApp.runsDataset);
+
+  // Get dataset for period between startDate and endDate
+  var runsDatasetForPeriod = filterRowsByDate(analyzerApp.runsDataset, startDate, endDate);
+
+  // Update log table with runs from period
+  analyzerApp.logDatatable.clear();
+  analyzerApp.logDatatable.rows.add(runsDatasetForPeriod);
+  analyzerApp.logDatatable.draw();
 
   // Calculate stats
-  var mid2011Stats = calculateStatsForPeriod(tRunsDataset, '2011-03-15', '2011-09-15');
+  var stats = calculateStatsForPeriod(runsDatasetForPeriod, startDate, endDate);
 
   // Show stats on page
-  $('#output').text(JSON.stringify(mid2011Stats, null, 2));
+  $('#output').text(JSON.stringify(stats, null, 2));
 }
 
+function getFirstDateInDataset(dataset) {
+  return _.min(dataset, function(row) { return row.Date; }).Date;
+}
+
+
+function getLastDateInDataset(dataset) {
+  return _.max(dataset, function(row) { return row.Date; }).Date;
+}
 
 function readRunningAheadTSV(tsvString) {
   return new CSV(tsvString, {
@@ -230,3 +208,57 @@ function transformRow(originalRow) {
 
   return newRow;
 }
+
+
+
+var AddedHeaders = {
+  DurationInMinutes: 'DurationInMinutes',
+  DistanceInMiles: 'DistanceInMiles'
+};
+
+
+var LogTableColumnDefs = [{
+    data: OriginalHeaders.Date,
+    title: 'Date',
+    render: function(data, type, row) {
+      return data.format('YYYY-MM-DD');
+    }
+  }, {
+    data: OriginalHeaders.TimeOfDay,
+    title: 'Time',
+    render: function(data, type, row) {
+      if (data) {
+        return data.format('h:mm a');
+      } else {
+        return '';
+      }
+    }
+  },
+
+  {
+    data: OriginalHeaders.SubType,
+    title: 'Sub Type'
+  }, {
+    data: AddedHeaders.DistanceInMiles,
+    title: 'Distance (mi)',
+    render: renderTwoDecimalPlaces
+  }, {
+    data: AddedHeaders.DurationInMinutes,
+    title: 'Duration',
+    render: function(minutes, type, row) {
+      if (minutes) {
+        var ms = minutes * 60 * 1000;
+        return moment.utc(ms).format('HH:mm:ss');
+      } else {
+        return '';
+      }
+    }
+  }, {
+    data: OriginalHeaders.Course,
+    title: 'Course'
+  }, {
+    data: OriginalHeaders.Temperature,
+    title: 'Temperature'
+  },
+];
+

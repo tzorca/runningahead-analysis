@@ -3,34 +3,49 @@
 <head>
   <meta charset="utf-8"/>
   <title>RunningAHEAD Log Analyzer</title>
-  <link rel='stylesheet' type='text/css' href='lib/datatables/datatables.min.css' />
-  <link rel='stylesheet' type='text/css' href='lib/bootstrap/bootstrap.min.css' />
-  <link rel='stylesheet' type='text/css' href='lib/bootstrap-datepicker/bootstrap-datepicker.min.css' />
-  <link rel='stylesheet' type='text/css' href='analyzer.css' />
-  <script src='lib/jquery/jquery-3.1.1.js'></script>
-  <script src='lib/csv/csv.js'></script>
-  <script src='lib/moment/moment.min.js'></script>
-  <script src='lib/quantities/quantities.js'></script>
-  <script src='lib/underscore/underscore.js'></script>
-  <script src='lib/datatables/datatables.min.js'></script>
-  <script src='lib/bootstrap/bootstrap.min.js'></script>
-  <script src='lib/bootstrap-datepicker/bootstrap-datepicker.min.js'></script>
-  <script src='raConstants.js'></script>
-  <script src='util.js'></script>
-  <script src='analyzer.js'></script>
+  <link rel="stylesheet" type="text/css" href="lib/datatables/datatables.min.css" />
+  <link rel="stylesheet" type="text/css" href="lib/bootstrap/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="lib/bootstrap-datepicker/bootstrap-datepicker.min.css" />
+  <link rel="stylesheet" type="text/css" href="analyzer.css" />
+  <script src="lib/jquery/jquery-3.1.1.js"></script>
+  <script src="lib/csv/csv.js"></script>
+  <script src="lib/moment/moment.min.js"></script>
+  <script src="lib/quantities/quantities.js"></script>
+  <script src="lib/underscore/underscore.js"></script>
+  <script src="lib/datatables/datatables.min.js"></script>
+  <script src="lib/bootstrap/bootstrap.min.js"></script>
+  <script src="lib/bootstrap-datepicker/bootstrap-datepicker.min.js"></script>
+  <script src="raConstants.js"></script>
+  <script src="util.js"></script>
+  <script src="analyzer.js"></script>
 </head>
 <body>
-<div class='container'>
+<div class="container">
   <h3>RunningAHEAD Log Analyzer</h3>
 
-    <br />
+  <br />
 
-  <table class='display compact hover cell-border' id='logTable'>
+  <p>Select a date range:</p>
+  <div class="row">
+    <div class="col-xs-6">
+      <div class="input-daterange input-group" id="log-datepicker">
+        <input type="text" class="input-sm form-control" name="start" id="log-start-date" />
+        <span class="input-group-addon">to</span>
+        <input type="text" class="input-sm form-control" name="end" id="log-end-date"  />
+      </div>
+    </div>
+  </div>
+
+  <br />
+
+  <h4>Runs</h4>
+  <table class="display compact hover cell-border" id="log-table">
   </table>
 
   <br />
 
-  <pre id='output'>
+  <h4>Stats</h4>
+  <pre id="output">
   </pre>
 </div>
 </body>
