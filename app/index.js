@@ -47,20 +47,43 @@ function readRunningAheadTSV(tsvString) {
   }).parse();
 }
 
+function readFileData(file, callback) {
+  if (!(window.File && window.FileReader && window.FileList && window.Blob)) {
+    alert('The File APIs are not fully supported by your browser.');
+    return;
+  }
+  
+  if (!file) {
+    alert("Failed to load file");
+    return;
+  }
+  
+  var reader = new FileReader();
+  reader.onload = function (readerEvt) {
+    var fileContents = readerEvt.target.result;
+    callback(fileContents);
+  }
+  reader.readAsText(file);
+}
+
 
 $(document).ready(function () {
   // Init log table
   analyzerApp.logTableManager = new ActivityLogTableManager('#log-table');
+  
+  // Add change event to get file from file input
+  $('#ra-log-file').change(function (inputEvt) {
+      var file = inputEvt.target.files[0];
+      
+      readFileData(file, function (logDataTSV) {
+        analyzerApp.fullDataset = StatsCalculator.transformDataset(readRunningAheadTSV(logDataTSV));
+        analyzerApp.runsDataset = analyzerApp.fullDataset.filter(function (row) {
+          return row[OriginalHeaders.Type] === ActivityTypes.Run;
+        });
 
-  // Get data, then reload table and stats
-  $.get('log.txt', function (logDataTSV) {
-    analyzerApp.fullDataset = StatsCalculator.transformDataset(readRunningAheadTSV(logDataTSV));
-    analyzerApp.runsDataset = analyzerApp.fullDataset.filter(function (row) {
-      return row[OriginalHeaders.Type] === ActivityTypes.Run;
-    });
-
-    reloadTableAndStats();
-  }, 'text');
+        reloadTableAndStats();
+      });
+  });
 
   // Add event handler to date picker range
   $('#log-datepicker input').datepicker({})
