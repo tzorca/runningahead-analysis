@@ -1,56 +1,13 @@
 /*jslint browser: true, nomen: true*/
 /*global $, moment, _, Qty, CSV*/
 /*global OriginalHeaders, AddedHeaders, ActivityTypes, DistanceUnits*/
-/*global renderTwoDecimalPlaces, sumByKeyInObject, StatsCalculator*/
+/*global renderTwoDecimalPlaces, sumByKeyInObject, StatsCalculator, ActivityLogTableManager*/
 
 var analyzerApp = {
   fullDataset: [],
   runsDataset: [],
-  logDatatable: {}
+  logTableManager: {}
 };
-
-
-var LogTableColumnDefs = [{
-    data: OriginalHeaders.Date,
-    title: 'Date',
-    render: function (data, type, row) {
-      return data.format('YYYY-MM-DD');
-    }
-  }, {
-    data: OriginalHeaders.TimeOfDay,
-    title: 'Time',
-    render: function (data, type, row) {
-      if (data) {
-        return data.format('h:mm a');
-      } else {
-        return '';
-      }
-    }
-  }, {
-    data: OriginalHeaders.SubType,
-    title: 'Sub Type'
-  }, {
-    data: AddedHeaders.DistanceInMiles,
-    title: 'Distance (mi)',
-    render: renderTwoDecimalPlaces
-  }, {
-    data: AddedHeaders.DurationInMinutes,
-    title: 'Duration',
-    render: function (minutes, type, row) {
-      if (minutes) {
-        var ms = minutes * 60 * 1000;
-        return moment.utc(ms).format('HH:mm:ss');
-      } else {
-        return '';
-      }
-    }
-  }, {
-    data: OriginalHeaders.Course,
-    title: 'Course'
-  }, {
-    data: OriginalHeaders.Temperature,
-    title: 'Temperature'
-  }];
 
 
 function getFirstDateInDataset(dataset) {
@@ -73,9 +30,7 @@ function reloadTableAndStats() {
   runsDatasetForPeriod = StatsCalculator.filterRowsByDate(analyzerApp.runsDataset, startDate, endDate);
 
   // Update log table with runs from period
-  analyzerApp.logDatatable.clear();
-  analyzerApp.logDatatable.rows.add(runsDatasetForPeriod);
-  analyzerApp.logDatatable.draw();
+  analyzerApp.logTableManager.setData(runsDatasetForPeriod);
 
   // Calculate stats
   stats = StatsCalculator.calculateStatsForPeriod(runsDatasetForPeriod, startDate, endDate);
@@ -95,13 +50,7 @@ function readRunningAheadTSV(tsvString) {
 
 $(document).ready(function () {
   // Init log table
-  analyzerApp.logDatatable = $('#log-table').DataTable({
-    data: [],
-    columns: LogTableColumnDefs,
-    deferRender: true,
-    pageLength: 10,
-    dom: 'tifp'
-  });
+  analyzerApp.logTableManager = new ActivityLogTableManager('#log-table');
 
   // Get data, then reload table and stats
   $.get('log.txt', function (logDataTSV) {
