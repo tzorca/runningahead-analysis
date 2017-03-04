@@ -1,63 +1,13 @@
 /*jslint browser: true, nomen: true*/
 /*global $, moment, _, Qty, CSV*/
-/*global OriginalHeaders, ActivityTypes, DistanceUnits*/
+/*global OriginalHeaders, AddedHeaders, ActivityTypes, DistanceUnits*/
 /*global renderTwoDecimalPlaces, sumByKeyInObject*/
-
 
 var analyzerApp = {
   fullDataset: [],
   runsDataset: [],
   logDatatable: {}
 };
-
-var AddedHeaders = {
-  DurationInMinutes: 'DurationInMinutes',
-  DistanceInMiles: 'DistanceInMiles'
-};
-
-
-var LogTableColumnDefs = [{
-    data: OriginalHeaders.Date,
-    title: 'Date',
-    render: function (data, type, row) {
-      return data.format('YYYY-MM-DD');
-    }
-  }, {
-    data: OriginalHeaders.TimeOfDay,
-    title: 'Time',
-    render: function (data, type, row) {
-      if (data) {
-        return data.format('h:mm a');
-      } else {
-        return '';
-      }
-    }
-  }, {
-    data: OriginalHeaders.SubType,
-    title: 'Sub Type'
-  }, {
-    data: AddedHeaders.DistanceInMiles,
-    title: 'Distance (mi)',
-    render: renderTwoDecimalPlaces
-  }, {
-    data: AddedHeaders.DurationInMinutes,
-    title: 'Duration',
-    render: function (minutes, type, row) {
-      if (minutes) {
-        var ms = minutes * 60 * 1000;
-        return moment.utc(ms).format('HH:mm:ss');
-      } else {
-        return '';
-      }
-    }
-  }, {
-    data: OriginalHeaders.Course,
-    title: 'Course'
-  }, {
-    data: OriginalHeaders.Temperature,
-    title: 'Temperature'
-  }];
-
 
 
 
@@ -156,29 +106,6 @@ function calculateStatsForPeriod(rows, startDate, endDate) {
 }
 
 
-function reloadTableAndStats() {
-  var startDate, endDate, runsDatasetForPeriod, stats;
-  // Determine start and end date
-  startDate = $('#log-start-date').val() || getFirstDateInDataset(analyzerApp.runsDataset);
-  endDate = $('#log-end-date').val() || getLastDateInDataset(analyzerApp.runsDataset);
-
-  // Get dataset for period between startDate and endDate
-  runsDatasetForPeriod = filterRowsByDate(analyzerApp.runsDataset, startDate, endDate);
-
-  // Update log table with runs from period
-  analyzerApp.logDatatable.clear();
-  analyzerApp.logDatatable.rows.add(runsDatasetForPeriod);
-  analyzerApp.logDatatable.draw();
-
-  // Calculate stats
-  stats = calculateStatsForPeriod(runsDatasetForPeriod, startDate, endDate);
-
-  // Show stats on page
-  $('#output').text(JSON.stringify(stats, null, 2));
-}
-
-
-
 
 function transformRow(originalRow) {
   var newRow, durationText, momentDuration, distText, distUnitText, origDist, distInMiles, dateText, timeText;
@@ -231,6 +158,74 @@ function transformDataset(dataset) {
 
   return newDataset;
 }
+
+
+
+
+var LogTableColumnDefs = [{
+    data: OriginalHeaders.Date,
+    title: 'Date',
+    render: function (data, type, row) {
+      return data.format('YYYY-MM-DD');
+    }
+  }, {
+    data: OriginalHeaders.TimeOfDay,
+    title: 'Time',
+    render: function (data, type, row) {
+      if (data) {
+        return data.format('h:mm a');
+      } else {
+        return '';
+      }
+    }
+  }, {
+    data: OriginalHeaders.SubType,
+    title: 'Sub Type'
+  }, {
+    data: AddedHeaders.DistanceInMiles,
+    title: 'Distance (mi)',
+    render: renderTwoDecimalPlaces
+  }, {
+    data: AddedHeaders.DurationInMinutes,
+    title: 'Duration',
+    render: function (minutes, type, row) {
+      if (minutes) {
+        var ms = minutes * 60 * 1000;
+        return moment.utc(ms).format('HH:mm:ss');
+      } else {
+        return '';
+      }
+    }
+  }, {
+    data: OriginalHeaders.Course,
+    title: 'Course'
+  }, {
+    data: OriginalHeaders.Temperature,
+    title: 'Temperature'
+  }];
+
+
+function reloadTableAndStats() {
+  var startDate, endDate, runsDatasetForPeriod, stats;
+  // Determine start and end date
+  startDate = $('#log-start-date').val() || getFirstDateInDataset(analyzerApp.runsDataset);
+  endDate = $('#log-end-date').val() || getLastDateInDataset(analyzerApp.runsDataset);
+
+  // Get dataset for period between startDate and endDate
+  runsDatasetForPeriod = filterRowsByDate(analyzerApp.runsDataset, startDate, endDate);
+
+  // Update log table with runs from period
+  analyzerApp.logDatatable.clear();
+  analyzerApp.logDatatable.rows.add(runsDatasetForPeriod);
+  analyzerApp.logDatatable.draw();
+
+  // Calculate stats
+  stats = calculateStatsForPeriod(runsDatasetForPeriod, startDate, endDate);
+
+  // Show stats on page
+  $('#output').text(JSON.stringify(stats, null, 2));
+}
+
 
 
 

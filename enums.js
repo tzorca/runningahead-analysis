@@ -46,3 +46,8 @@ var DistanceUnits = {
 var ActivityTypes = {
   Run: 'Run'
 };
+
+var AddedHeaders = {
+  DurationInMinutes: 'DurationInMinutes',
+  DistanceInMiles: 'DistanceInMiles'
+};
