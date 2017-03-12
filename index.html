@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8"/>
   <title>RunningAHEAD Log Analyzer</title>
-  <link rel="stylesheet" type="text/css" href="lib/datatables/datatables.min.css" />
-  <link rel="stylesheet" type="text/css" href="lib/bootstrap/bootstrap.min.css" />
-  <link rel="stylesheet" type="text/css" href="lib/bootstrap-datepicker/bootstrap-datepicker.min.css" />
-  <link rel="stylesheet" type="text/css" href="analyzer.css" />
+  <link rel="stylesheet" href="lib/datatables/datatables.min.css" />
+  <link rel="stylesheet" href="lib/bootstrap/bootstrap.min.css" />
+  <link rel="stylesheet" href="lib/bootstrap-datepicker/bootstrap-datepicker.min.css" />
+  <link rel="stylesheet" href="analyzer.css" />
   <script src="lib/jquery/jquery-3.1.1.js"></script>
   <script src="lib/csv/csv.js"></script>
   <script src="lib/moment/moment.min.js"></script>
@@ -17,7 +17,7 @@
   <script src="lib/bootstrap-datepicker/bootstrap-datepicker.min.js"></script>
   <script src="app/enums.js"></script>
   <script src="app/util.js"></script>
-  <script src="app/statsCalculator.js"></script>>
+  <script src="app/statsCalculator.js"></script>
   <script src="app/activityLogTableManager.js"></script>
   <script src="app/index.js"></script>
 </head>
@@ -27,31 +27,47 @@
 
   <br />
   
-  <span>Upload a RunningAHEAD CSV log file:</span>
-  <input id="ra-log-file" type="file" />
-  
-  <p>Select a date range:</p>
-  <div class="row">
-    <div class="col-xs-6">
-      <div class="input-daterange input-group" id="log-datepicker">
-        <input type="text" class="input-sm form-control" name="start" id="log-start-date" />
-        <span class="input-group-addon">to</span>
-        <input type="text" class="input-sm form-control" name="end" id="log-end-date"  />
+  <div id="file-upload" class="well">
+    <span>Upload a RunningAHEAD tab-separated log file:</span>
+    <div class="well well-sm">
+      <input id="ra-log-file" type="file" />
+    </div>
+    <button id="ra-log-file-submit" type="button" class="btn btn-primary">Submit</button>
+  </div>
+
+  <div class="hidden" id="app-view">
+
+    <div class="well well-sm">
+      <p>Select a date range:</p>
+      <div class="row">
+        <div class="col-xs-6">
+          <div class="input-daterange input-group" id="log-datepicker">
+            <input type="text" class="input-sm form-control" name="start" id="log-start-date" />
+            <span class="input-group-addon">to</span>
+            <input type="text" class="input-sm form-control" name="end" id="log-end-date"  />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <br />
+
+    <ul class="nav nav-tabs">
+      <li class="active"><a data-toggle="tab" href="#tab-runs">Runs</a></li>
+      <li><a data-toggle="tab" href="#tab-stats">Stats</a></li>
+    </ul>
+
+    <div class="tab-content">
+      <div id="tab-runs" class="tab-pane fade in active">
+        <table class="display compact hover cell-border" id="log-table">
+        </table>
+      </div>
+      <div id="tab-stats" class="tab-pane fade">
+        <pre id="output">
+        </pre>
       </div>
     </div>
   </div>
-
-  <br />
-
-  <h4>Runs</h4>
-  <table class="display compact hover cell-border" id="log-table">
-  </table>
-
-  <br />
-
-  <h4>Stats</h4>
-  <pre id="output">
-  </pre>
 </div>
 </body>
 </html>

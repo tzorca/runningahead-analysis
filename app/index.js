@@ -71,9 +71,9 @@ $(document).ready(function () {
   // Init log table
   analyzerApp.logTableManager = new ActivityLogTableManager('#log-table');
   
-  // Add change event to get file from file input
-  $('#ra-log-file').change(function (inputEvt) {
-      var file = inputEvt.target.files[0];
+  // Add file submit handler event to get file from file input
+  $('#ra-log-file-submit').click(function (evt) {
+      var file = $('#ra-log-file')[0].files[0];
       
       readFileData(file, function (logDataTSV) {
         analyzerApp.fullDataset = StatsCalculator.transformDataset(readRunningAheadTSV(logDataTSV));
@@ -82,6 +82,8 @@ $(document).ready(function () {
         });
 
         reloadTableAndStats();
+
+        $('#app-view').removeClass('hidden');
       });
   });
 
