@@ -15,6 +15,7 @@
   <script src="lib/datatables/datatables.min.js"></script>
   <script src="lib/bootstrap/bootstrap.min.js"></script>
   <script src="lib/bootstrap-datepicker/bootstrap-datepicker.min.js"></script>
+  <script src="lib/chartjs/chart.js"></script>
   <script src="app/enums.js"></script>
   <script src="app/util.js"></script>
   <script src="app/statsCalculator.js"></script>
@@ -66,6 +67,8 @@
 
       <div id="tab-races" class="tab-pane fade">
         <table class="full-width display compact hover cell-border" id="race-list-table"></table>
+        <br />
+        <canvas id="race-performance-chart" height="400"></canvas>
       </div>
 
       <div id="tab-stats" class="tab-pane fade">

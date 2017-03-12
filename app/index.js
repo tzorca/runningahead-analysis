@@ -21,13 +21,58 @@ function getLastDateInDataset(dataset) {
 }
 
 
-function loadRaceList() {
+function loadRaceListAndChart() {
   var raceDataset = analyzerApp.runsDataset.filter(function (row) {
     return row[OriginalHeaders.SubType] === SubTypes.Race;
   });
 
-  // Set table data
+  // Set race list table data
   analyzerApp.raceTableManager.setData(raceDataset);
+
+  // Calculate race chart data
+  var raceChartData = raceDataset.map(function(row) {
+    return {
+      x: moment(row[OriginalHeaders.Date]).toDate(),
+      y: row[AddedHeaders.EquivalentDurationFor5K]
+    };
+  });
+
+  // Set up race performance chart
+  new Chart($('#race-performance-chart'), {
+      type: 'line',
+      data: {
+        datasets: [{
+          label: '5k Equivalent',
+          data: raceChartData
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          xAxes: [{
+            type: 'time',
+            position: 'bottom',
+            scaleLabel: {
+              display: true,
+              labelString: 'Date'
+            },
+            time: {
+              unit: 'year',
+              displayFormats: {
+                year: 'YYYY'
+              }
+            }
+          }],
+          yAxes: [{
+            scaleLabel: {
+              display: true,
+              labelString: '5K Time'
+            }
+          }]
+        }
+      }
+    });
 }
 
 function reloadTableAndStats() {
@@ -94,7 +139,7 @@ $(document).ready(function () {
 
         reloadTableAndStats();
 
-        loadRaceList();
+        loadRaceListAndChart();
 
         $('#app-view').removeClass('hidden');
       });
