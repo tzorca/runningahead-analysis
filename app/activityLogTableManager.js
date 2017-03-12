@@ -55,7 +55,7 @@ var ActivityLogTableManager = function (datatableSelector) {
     columns: self.ColumnDefs,
     deferRender: true,
     pageLength: 10,
-    dom: 'tifp'
+    dom: 'fpti'
   });
   
   self.setData = function (newDataset) {
