@@ -2,3 +2,7 @@ body {
   background-color: #eaeaea;
   font-family: Helvetica, Arial, sans-serif;
 }
+
+.full-width {
+  width: 100% !important;
+}

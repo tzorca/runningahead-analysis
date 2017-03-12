@@ -6,7 +6,8 @@
 var analyzerApp = {
   fullDataset: [],
   runsDataset: [],
-  logTableManager: {}
+  runTableManager: {},
+  raceTableManager: {},
 };
 
 
@@ -20,6 +21,15 @@ function getLastDateInDataset(dataset) {
 }
 
 
+function loadRaceList() {
+  var raceDataset = analyzerApp.runsDataset.filter(function (row) {
+    return row[OriginalHeaders.SubType] === SubTypes.Race;
+  });
+
+  // Set table data
+  analyzerApp.raceTableManager.setData(raceDataset);
+}
+
 function reloadTableAndStats() {
   var startDate, endDate, runsDatasetForPeriod, stats;
   // Determine start and end date
@@ -30,7 +40,7 @@ function reloadTableAndStats() {
   runsDatasetForPeriod = StatsCalculator.filterRowsByDate(analyzerApp.runsDataset, startDate, endDate);
 
   // Update log table with runs from period
-  analyzerApp.logTableManager.setData(runsDatasetForPeriod);
+  analyzerApp.runTableManager.setData(runsDatasetForPeriod);
 
   // Calculate stats
   stats = StatsCalculator.calculateStatsForPeriod(runsDatasetForPeriod, startDate, endDate);
@@ -68,8 +78,9 @@ function readFileData(file, callback) {
 
 
 $(document).ready(function () {
-  // Init log table
-  analyzerApp.logTableManager = new ActivityLogTableManager('#log-table');
+  // Init tables
+  analyzerApp.runTableManager = new ActivityLogTableManager('#run-log-table');
+  analyzerApp.raceTableManager = new ActivityLogTableManager('#race-list-table');
   
   // Add file submit handler event to get file from file input
   $('#ra-log-file-submit').click(function (evt) {
@@ -82,6 +93,8 @@ $(document).ready(function () {
         });
 
         reloadTableAndStats();
+
+        loadRaceList();
 
         $('#app-view').removeClass('hidden');
       });

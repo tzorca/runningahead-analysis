@@ -51,3 +51,7 @@ var AddedHeaders = {
   DurationInMinutes: 'DurationInMinutes',
   DistanceInMiles: 'DistanceInMiles'
 };
+
+var SubTypes = {
+  Race: 'Race'
+};

@@ -59,7 +59,6 @@ var ActivityLogTableManager = function (datatableSelector) {
   });
   
   self.setData = function (newDataset) {
-    console.log(self.logDatatable.add);
     self.logDatatable.clear();
     
     self.logDatatable.rows.add(newDataset);

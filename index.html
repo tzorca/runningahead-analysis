@@ -54,20 +54,28 @@
 
     <ul class="nav nav-tabs">
       <li class="active"><a data-toggle="tab" href="#tab-runs">Runs</a></li>
+      <li><a data-toggle="tab" href="#tab-races">Races</a></li>
       <li><a data-toggle="tab" href="#tab-stats">Stats</a></li>
     </ul>
 
     <div class="tab-content">
+
       <div id="tab-runs" class="tab-pane fade in active">
-        <table class="display compact hover cell-border" id="log-table">
-        </table>
+        <table class="full-width display compact hover cell-border" id="run-log-table"></table>
       </div>
+
+      <div id="tab-races" class="tab-pane fade">
+        <table class="full-width display compact hover cell-border" id="race-list-table"></table>
+      </div>
+
       <div id="tab-stats" class="tab-pane fade">
-        <pre id="output">
-        </pre>
+        <pre id="output"></pre>
       </div>
+
     </div>
   </div>
+
+  <br />
 </div>
 </body>
 </html>
