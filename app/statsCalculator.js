@@ -89,7 +89,8 @@ var StatsCalculator = {
   },
 
   transformRow: function (originalRow) {
-    var newRow, durationText, momentDuration, distText, distUnitText, origDist, distInMiles, dateText, timeText;
+    var newRow, durationText, momentDuration, durationInMinutes, distText, distUnitText, origDist, distInMiles, dateText, timeText;
+    var distance_coefficient = 1.08, fiveKilometersInMiles = 3.107
 
     // Shallow copy original row
     newRow = $.extend({}, originalRow);
@@ -98,7 +99,8 @@ var StatsCalculator = {
     durationText = newRow[OriginalHeaders.Duration];
     if (durationText && durationText.length > 0) {
       momentDuration = moment.duration(durationText);
-      newRow[AddedHeaders.DurationInMinutes] = momentDuration.asMinutes();
+      durationInMinutes = momentDuration.asMinutes()
+      newRow[AddedHeaders.DurationInMinutes] = durationInMinutes;
     }
 
     // Distance in miles
@@ -108,11 +110,19 @@ var StatsCalculator = {
       origDist = parseFloat(distText);
 
       if (distUnitText === DistanceUnits.Mile) {
-        newRow[AddedHeaders.DistanceInMiles] = origDist;
+        distInMiles = origDist;
+        newRow[AddedHeaders.DistanceInMiles] = distInMiles;
       } else if (distUnitText === DistanceUnits.Kilometer) {
         distInMiles = Qty(origDist + ' km').to('mi').scalar;
         newRow[AddedHeaders.DistanceInMiles] = distInMiles;
       }
+    }
+
+    // Equivalent time for 5 kilometer distance (uses Pete Riegel's formula)
+    newRow[AddedHeaders.EquivalentDurationFor5K] = "";
+    if (durationInMinutes && distInMiles) {
+      newRow[AddedHeaders.EquivalentDurationFor5K] = durationInMinutes * 
+        Math.pow(fiveKilometersInMiles / distInMiles, distance_coefficient);
     }
 
     // Date as JS moment (Replace Date column)
@@ -126,6 +136,7 @@ var StatsCalculator = {
     if (timeText && timeText.length > 0) {
       newRow[OriginalHeaders.TimeOfDay] = moment(timeText, 'hh:mm a');
     }
+
 
     return newRow;
   },

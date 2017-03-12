@@ -6,6 +6,15 @@ function renderTwoDecimalPlaces(data, type, row) {
   }
 }
 
+function renderMinutesDuration(minutes, type, row) {
+  if (minutes) {
+    var ms = minutes * 60 * 1000;
+    return moment.utc(ms).format('HH:mm:ss');
+  } else {
+    return '';
+  }
+}
+
 
 function sumByKeyInObject(array, key) {
   return _.reduce(array,

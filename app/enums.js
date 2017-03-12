@@ -49,7 +49,8 @@ var ActivityTypes = {
 
 var AddedHeaders = {
   DurationInMinutes: 'DurationInMinutes',
-  DistanceInMiles: 'DistanceInMiles'
+  DistanceInMiles: 'DistanceInMiles',
+  EquivalentDurationFor5K: 'EquivalentDurationFor5K'
 };
 
 var SubTypes = {

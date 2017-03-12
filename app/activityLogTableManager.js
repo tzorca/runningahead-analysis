@@ -33,22 +33,15 @@ var ActivityLogTableManager = function (datatableSelector) {
   }, {
     data: AddedHeaders.DurationInMinutes,
     title: 'Duration',
-    render: function (minutes, type, row) {
-      if (minutes) {
-        var ms = minutes * 60 * 1000;
-        return moment.utc(ms).format('HH:mm:ss');
-      } else {
-        return '';
-      }
-    }
+    render: renderMinutesDuration,
+  }, {
+    data: AddedHeaders.EquivalentDurationFor5K,
+    title: '5K Equivalent',
+    render: renderMinutesDuration
   }, {
     data: OriginalHeaders.Course,
     title: 'Course'
-  }, {
-    data: OriginalHeaders.Temperature,
-    title: 'Temperature'
   }];
-
   
   self.logDatatable = $(datatableSelector).DataTable({
     data: [],
