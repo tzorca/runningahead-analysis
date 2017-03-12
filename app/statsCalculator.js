@@ -15,6 +15,21 @@ var StatsCalculator = {
     });
   },
 
+  // Returns a list of unique subtypes used in a dataset
+  getAllSubTypes: function (rows) {
+    return _.uniq(rows.map(function (row) {
+      return row[OriginalHeaders.SubType];
+    }));
+  },
+
+
+  // Return filtered rows where SubType is the specified targetSubType
+  filterRowsBySubType: function (rows, targetSubType) {
+    return rows.filter(function (row) {
+      return row[OriginalHeaders.SubType] === targetSubType;
+    });
+  },
+
   calculateStatsForPeriod: function (rows, startDate, endDate) {
     var runsByDate, runsWithNotes, runsWithNotesByDate, pRows = StatsCalculator.filterRowsByDate(rows, startDate, endDate), stats = {};
 

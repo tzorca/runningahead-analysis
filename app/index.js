@@ -67,7 +67,7 @@ function loadRaceListAndChart() {
           yAxes: [{
             scaleLabel: {
               display: true,
-              labelString: '5K Time'
+              labelString: '5K Equivalent'
             }
           }]
         }
@@ -76,21 +76,31 @@ function loadRaceListAndChart() {
 }
 
 function reloadTableAndStats() {
-  var startDate, endDate, runsDatasetForPeriod, stats;
+  var startDate, endDate, runDatasetForPeriod, runDatasetForPeriodAndSubtype, stats, subType, subTypeList, i;
   // Determine start and end date
   startDate = $('#log-start-date').val() || getFirstDateInDataset(analyzerApp.runsDataset);
   endDate = $('#log-end-date').val() || getLastDateInDataset(analyzerApp.runsDataset);
 
   // Get dataset for period between startDate and endDate
-  runsDatasetForPeriod = StatsCalculator.filterRowsByDate(analyzerApp.runsDataset, startDate, endDate);
+  runDatasetForPeriod = StatsCalculator.filterRowsByDate(analyzerApp.runsDataset, startDate, endDate);
 
   // Update log table with runs from period
-  analyzerApp.runTableManager.setData(runsDatasetForPeriod);
+  analyzerApp.runTableManager.setData(runDatasetForPeriod);
 
-  // Calculate stats
-  stats = StatsCalculator.calculateStatsForPeriod(runsDatasetForPeriod, startDate, endDate);
+  // Calculate overall stats
+  stats = {
+    Overall: StatsCalculator.calculateStatsForPeriod(runDatasetForPeriod, startDate, endDate)
+  };
 
-  // Show stats on page
+  // Calculate stats for each subtype
+  subTypeList = StatsCalculator.getAllSubTypes(runDatasetForPeriod);
+  for (var i = 0; i < subTypeList.length; i++) {
+    subType = subTypeList[i];
+    runDatasetForPeriodAndSubtype = StatsCalculator.filterRowsBySubType(runDatasetForPeriod, subType);
+    stats["SubType " + subType] = StatsCalculator.calculateStatsForPeriod(runDatasetForPeriodAndSubtype, startDate, endDate);
+  }
+
+  // Show overall stats
   $('#output').text(JSON.stringify(stats, null, 2));
 }
 
