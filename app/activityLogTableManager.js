@@ -41,6 +41,13 @@ var ActivityLogTableManager = function (datatableSelector) {
   }, {
     data: OriginalHeaders.Course,
     title: 'Course'
+  }, {
+    data: OriginalHeaders.AvgHR,
+    title: 'Avg HR'
+  }, {
+    data: AddedHeaders.RelativeRunningEconomy,
+    title: 'Economy',
+    render: renderTwoDecimalPlaces
   }];
   
   self.logDatatable = $(datatableSelector).DataTable({

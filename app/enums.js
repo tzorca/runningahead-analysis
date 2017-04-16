@@ -50,7 +50,8 @@ var ActivityTypes = {
 var AddedHeaders = {
   DurationInMinutes: 'DurationInMinutes',
   DistanceInMiles: 'DistanceInMiles',
-  EquivalentDurationFor5K: 'EquivalentDurationFor5K'
+  EquivalentDurationFor5K: 'EquivalentDurationFor5K',
+  RelativeRunningEconomy: 'RelativeRunningEconomy'
 };
 
 var SubTypes = {

@@ -104,8 +104,8 @@ var StatsCalculator = {
   },
 
   transformRow: function (originalRow) {
-    var newRow, durationText, momentDuration, durationInMinutes, distText, distUnitText, origDist, distInMiles, dateText, timeText;
-    var distance_coefficient = 1.08, fiveKilometersInMiles = 3.107
+    var newRow, durationText, momentDuration, durationInMinutes, distText, distUnitText, origDist, distInMiles, dateText, timeText, restingHR, avgHR, totalHeartBeats, workPerMile;
+    var distanceCoefficient = 1.08, fiveKilometersInMiles = 3.107
 
     // Shallow copy original row
     newRow = $.extend({}, originalRow);
@@ -137,7 +137,7 @@ var StatsCalculator = {
     newRow[AddedHeaders.EquivalentDurationFor5K] = "";
     if (durationInMinutes && distInMiles) {
       newRow[AddedHeaders.EquivalentDurationFor5K] = durationInMinutes * 
-        Math.pow(fiveKilometersInMiles / distInMiles, distance_coefficient);
+        Math.pow(fiveKilometersInMiles / distInMiles, distanceCoefficient);
     }
 
     // Date as JS moment (Replace Date column)
@@ -152,6 +152,16 @@ var StatsCalculator = {
       newRow[OriginalHeaders.TimeOfDay] = moment(timeText, 'hh:mm a');
     }
 
+    // Relative running economy
+    // Formula sourced from http://fellrnr.com/wiki/Running_Economy
+    restingHR = 45; // TODO: Make this configurable
+    avgHR = newRow[OriginalHeaders.AvgHR];
+    newRow[AddedHeaders.RelativeRunningEconomy] = "";
+    if (durationInMinutes && distInMiles && avgHR) {
+      totalHeartBeats = (avgHR - restingHR) * durationInMinutes;
+      workPerMile = totalHeartBeats / distInMiles;
+      newRow[AddedHeaders.RelativeRunningEconomy] = 1 / workPerMile * 100000;
+    }
 
     return newRow;
   },
