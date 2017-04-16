@@ -104,8 +104,9 @@ var StatsCalculator = {
   },
 
   transformRow: function (originalRow) {
-    var newRow, durationText, momentDuration, durationInMinutes, distText, distUnitText, origDist, distInMiles, dateText, timeText, restingHR, avgHR, totalHeartBeats, workPerMile;
-    var distanceCoefficient = 1.08, fiveKilometersInMiles = 3.107
+    var newRow, durationText, momentDuration, durationInMinutes, distText, distUnitText, origDist, distInMiles, dateText, timeText, restingHR, avgHR, totalHeartBeats, workPerMile, minDurationToCalcEconomy;
+    var distanceCoefficient = 1.08, restingHR = 45, minDurationToCalcEconomy = 15; // TODO: Make these configurable
+    var fiveKilometersInMiles = 3.107;
 
     // Shallow copy original row
     newRow = $.extend({}, originalRow);
@@ -154,10 +155,9 @@ var StatsCalculator = {
 
     // Relative running economy
     // Formula sourced from http://fellrnr.com/wiki/Running_Economy
-    restingHR = 45; // TODO: Make this configurable
     avgHR = newRow[OriginalHeaders.AvgHR];
     newRow[AddedHeaders.RelativeRunningEconomy] = "";
-    if (durationInMinutes && distInMiles && avgHR) {
+    if (durationInMinutes && distInMiles && avgHR && durationInMinutes >= minDurationToCalcEconomy) {
       totalHeartBeats = (avgHR - restingHR) * durationInMinutes;
       workPerMile = totalHeartBeats / distInMiles;
       newRow[AddedHeaders.RelativeRunningEconomy] = 1 / workPerMile * 100000;
