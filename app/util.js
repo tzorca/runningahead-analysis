@@ -15,6 +15,9 @@ function renderMinutesDuration(minutes, type, row) {
   }
 }
 
+function roundFloat(val, decimalPlaces) {
+  return parseFloat(val.toFixed(decimalPlaces));
+}
 
 function sumByKeyInObject(array, key) {
   return _.reduce(array,

@@ -101,7 +101,7 @@ function reloadTableAndStats() {
   }
 
   // Show overall stats
-  $('#output').text(JSON.stringify(stats, null, 2));
+  $('#output').jsonViewer(stats);
 }
 
 function readRunningAheadTSV(tsvString) {
