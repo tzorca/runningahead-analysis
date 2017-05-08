@@ -3,6 +3,26 @@
 /*global OriginalHeaders, AddedHeaders, ActivityTypes, DistanceUnits*/
 /*global sumByKeyInObject*/
 
+var StatsKeys = {
+  Start_Date: "Start Date",
+  End_Date: "End Date",
+  Days_in_Period: "Days in Period",
+  Total_Runs: "Total Runs",
+  Average_Days_Run_Per_Week: "Average Days Run Per Week",
+  Average_Runs_Per_Day_Run: "Average Runs Per Day Run",
+  Total_Miles: "Total Miles",
+  Average_Miles_Per_Week: "Average Miles Per Week",
+  Average_Miles_Per_Day_Run: "Average Miles Per Day Run",
+  Total_Hours_Run: "Total Hours Run",
+  Average_Hours_Per_Week: "Average Hours Per Week",
+  Average_Pace: "Average Pace",
+  Total_Runs_with_Notes: "Total Runs with Notes",
+  Total_Note_Length: "Total Note Length",
+  Average_Note_Length: "Average Note Length",
+  Total_Days_with_Notes: "Total Days with Notes",
+  Percent_of_Days_with_Notes: "Percent of Days with Notes"
+};
+
 var StatsCalculator = {
   // Return filtered rows where Date is within [startDate, endDate]
   filterRowsByDate: function (rows, startDate, endDate) {
@@ -34,86 +54,86 @@ var StatsCalculator = {
     var runsByDate, runsWithNotes, runsWithNotesByDate, pRows = StatsCalculator.filterRowsByDate(rows, startDate, endDate), stats = {};
 
     // Start and end date
-    stats.Start_Date = startDate.format('M/D/YYYY');
-    stats.End_Date = endDate.format('M/D/YYYY');
+    stats[StatsKeys.Start_Date] = startDate.format('M/D/YYYY');
+    stats[StatsKeys.End_Date] = endDate.format('M/D/YYYY');
 
     // Days in period
-    stats.Days_in_Period = moment(endDate)
+    stats[StatsKeys.Days_in_Period] = moment(endDate)
       .diff(moment(startDate), 'days');
 
     // Total runs
-    stats.Total_Runs = pRows.length;
+    stats[StatsKeys.Total_Runs] = pRows.length;
 
     runsByDate = _.groupBy(pRows, function (row) {
       return row.Date;
     });
 
     // Total days run
-    stats.Total_Days_Run = Object.keys(runsByDate).length;
+    stats[StatsKeys.Total_Days_Run] = Object.keys(runsByDate).length;
 
     // Average days run per week
-    stats.Average_Days_Run_Per_Week = (stats.Total_Days_Run / stats.Days_in_Period) * 7;
+    stats[StatsKeys.Average_Days_Run_Per_Week] = (stats[StatsKeys.Total_Days_Run] / stats[StatsKeys.Days_in_Period]) * 7;
 
     // Average runs per day run
-    stats.Average_Runs_Per_Day_Run = stats.Total_Runs / stats.Total_Days_Run;
+    stats[StatsKeys.Average_Runs_Per_Day_Run] = stats[StatsKeys.Total_Runs] / stats[StatsKeys.Total_Days_Run];
 
     // Total miles
-    stats.Total_Miles = sumByKeyInObject(pRows, AddedHeaders.DistanceInMiles);
+    stats[StatsKeys.Total_Miles] = sumByKeyInObject(pRows, AddedHeaders.DistanceInMiles);
 
     // Average miles per week
-    stats.Average_Miles_Per_Week = stats.Total_Miles / stats.Days_in_Period * 7;
+    stats[StatsKeys.Average_Miles_Per_Week] = stats[StatsKeys.Total_Miles] / stats[StatsKeys.Days_in_Period] * 7;
 
     // Average distance per day run
-    stats.Average_Miles_Per_Day_Run = stats.Total_Miles / stats.Total_Days_Run;
+    stats[StatsKeys.Average_Miles_Per_Day_Run] = stats[StatsKeys.Total_Miles] / stats[StatsKeys.Total_Days_Run];
 
     // Total hours running
-    stats.Total_Hours_Run = sumByKeyInObject(pRows, AddedHeaders.DurationInMinutes) / 60;
+    stats[StatsKeys.Total_Hours_Run] = sumByKeyInObject(pRows, AddedHeaders.DurationInMinutes) / 60;
 
     // Average hours per week
-    stats.Average_Hours_Per_Week = stats.Total_Hours_Run / stats.Days_in_Period * 7;
+    stats[StatsKeys.Average_Hours_Per_Week] = stats[StatsKeys.Total_Hours_Run] / stats[StatsKeys.Days_in_Period] * 7;
 
     // Average pace (minutes per mile)
-    stats.Average_Pace = (stats.Total_Hours_Run * 60) / stats.Total_Miles;
+    stats[StatsKeys.Average_Pace] = (stats[StatsKeys.Total_Hours_Run] * 60) / stats[StatsKeys.Total_Miles];
 
     runsWithNotes = pRows.filter(function (row) {
       return row[OriginalHeaders.Notes] && row[OriginalHeaders.Notes].length > 0;
     });
 
     // Total runs with notes
-    stats.Total_Runs_with_Notes = runsWithNotes.length;
+    stats[StatsKeys.Total_Runs_with_Notes] = runsWithNotes.length;
 
     // Total note length
-    stats.Total_Note_Length = _.reduce(runsWithNotes, function (previous, row) {
+    stats[StatsKeys.Total_Note_Length] = _.reduce(runsWithNotes, function (previous, row) {
       return previous + row[OriginalHeaders.Notes].length;
     }, 0);
 
     // Average note length
-    stats.Average_Note_Length = stats.Total_Note_Length / stats.Total_Runs_with_Notes;
+    stats[StatsKeys.Average_Note_Length] = stats[StatsKeys.Total_Note_Length] / stats[StatsKeys.Total_Runs_with_Notes];
 
     runsWithNotesByDate = _.groupBy(runsWithNotes, function (row) {
       return row.Date;
     });
 
     // Total days with notes
-    stats.Total_Days_with_Notes = Object.keys(runsWithNotesByDate).length;
+    stats[StatsKeys.Total_Days_with_Notes] = Object.keys(runsWithNotesByDate).length;
 
     // Percent of days with notes
-    stats.Percent_of_Days_with_Notes = stats.Total_Days_with_Notes / stats.Days_in_Period * 100;
+    stats[StatsKeys.Percent_of_Days_with_Notes] = stats[StatsKeys.Total_Days_with_Notes] / stats[StatsKeys.Days_in_Period] * 100;
 
     // Round for display
-    stats.Average_Days_Run_Per_Week = roundFloat(stats.Average_Days_Run_Per_Week, 1);
-    stats.Average_Runs_Per_Day_Run = roundFloat(stats.Average_Runs_Per_Day_Run, 1);
-    stats.Total_Miles = roundFloat(stats.Total_Miles, 1);
-    stats.Average_Miles_Per_Week = roundFloat(stats.Average_Miles_Per_Week, 1);
-    stats.Average_Miles_Per_Day_Run = roundFloat(stats.Average_Miles_Per_Day_Run, 1);
-    stats.Total_Hours_Run = roundFloat(stats.Total_Hours_Run, 1);
-    stats.Average_Hours_Per_Week = roundFloat(stats.Average_Hours_Per_Week, 1);
-    stats.Average_Pace = roundFloat(stats.Average_Pace, 1);
-    stats.Total_Runs_with_Notes = roundFloat(stats.Total_Runs_with_Notes, 1);
-    stats.Total_Note_Length = roundFloat(stats.Total_Note_Length, 1);
-    stats.Average_Note_Length = roundFloat(stats.Average_Note_Length, 1);
-    stats.Total_Days_with_Notes = roundFloat(stats.Total_Days_with_Notes, 1);
-    stats.Percent_of_Days_with_Notes = roundFloat(stats.Percent_of_Days_with_Notes, 1);
+    stats[StatsKeys.Average_Days_Run_Per_Week] = roundFloat(stats[StatsKeys.Average_Days_Run_Per_Week], 1);
+    stats[StatsKeys.Average_Runs_Per_Day_Run] = roundFloat(stats[StatsKeys.Average_Runs_Per_Day_Run], 1);
+    stats[StatsKeys.Total_Miles] = roundFloat(stats[StatsKeys.Total_Miles], 1);
+    stats[StatsKeys.Average_Miles_Per_Week] = roundFloat(stats[StatsKeys.Average_Miles_Per_Week], 1);
+    stats[StatsKeys.Average_Miles_Per_Day_Run] = roundFloat(stats[StatsKeys.Average_Miles_Per_Day_Run], 1);
+    stats[StatsKeys.Total_Hours_Run] = roundFloat(stats[StatsKeys.Total_Hours_Run], 1);
+    stats[StatsKeys.Average_Hours_Per_Week] = roundFloat(stats[StatsKeys.Average_Hours_Per_Week], 1);
+    stats[StatsKeys.Average_Pace] = roundFloat(stats[StatsKeys.Average_Pace], 1);
+    stats[StatsKeys.Total_Runs_with_Notes] = roundFloat(stats[StatsKeys.Total_Runs_with_Notes], 1);
+    stats[StatsKeys.Total_Note_Length] = roundFloat(stats[StatsKeys.Total_Note_Length], 1);
+    stats[StatsKeys.Average_Note_Length] = roundFloat(stats[StatsKeys.Average_Note_Length], 1);
+    stats[StatsKeys.Total_Days_with_Notes] = roundFloat(stats[StatsKeys.Total_Days_with_Notes], 1);
+    stats[StatsKeys.Percent_of_Days_with_Notes] = roundFloat(stats[StatsKeys.Percent_of_Days_with_Notes], 1);
 
     return stats;
   },
