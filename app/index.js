@@ -20,6 +20,22 @@ function getLastDateInDataset(dataset) {
   return _.max(dataset, function (row) { return row.Date; }).Date;
 }
 
+function getMonthStartDatesInPeriod(startDate, endDate) {
+  startDate = moment(startDate);
+  endDate = moment(endDate);
+
+  var currentMonthStartDate = startDate.startOf('month');
+  var monthStartDates = [];
+  var maxIterations = 5000;
+  var iteration = 0;
+  while (currentMonthStartDate < endDate && iteration < maxIterations) {
+    monthStartDates.push(moment(currentMonthStartDate));
+    iteration++;
+    currentMonthStartDate.add(1, 'months');
+  }
+
+  return monthStartDates;
+}
 
 function loadRaceListAndChart() {
   var raceDataset = analyzerApp.runsDataset.filter(function (row) {
@@ -76,32 +92,43 @@ function loadRaceListAndChart() {
 }
 
 function reloadTableAndStats() {
-  var startDate, endDate, runDatasetForPeriod, runDatasetForPeriodAndSubtype, stats, subType, subTypeList, i;
   // Determine start and end date
-  startDate = $('#log-start-date').val() || getFirstDateInDataset(analyzerApp.runsDataset);
-  endDate = $('#log-end-date').val() || getLastDateInDataset(analyzerApp.runsDataset);
+  var startDate = $('#log-start-date').val() || getFirstDateInDataset(analyzerApp.runsDataset);
+  var endDate = $('#log-end-date').val() || getLastDateInDataset(analyzerApp.runsDataset);
 
   // Get dataset for period between startDate and endDate
-  runDatasetForPeriod = StatsCalculator.filterRowsByDate(analyzerApp.runsDataset, startDate, endDate);
+  var runDatasetForPeriod = StatsCalculator.filterRowsByDate(analyzerApp.runsDataset, startDate, endDate);
 
   // Update log table with runs from period
   analyzerApp.runTableManager.setData(runDatasetForPeriod);
 
   // Calculate overall stats
-  stats = {
+  var stats = {
     Overall: StatsCalculator.calculateStatsForPeriod(runDatasetForPeriod, startDate, endDate)
   };
 
   // Calculate stats for each subtype
-  subTypeList = StatsCalculator.getAllSubTypes(runDatasetForPeriod);
+  var subTypeList = StatsCalculator.getAllSubTypes(runDatasetForPeriod);
   for (var i = 0; i < subTypeList.length; i++) {
-    subType = subTypeList[i];
-    runDatasetForPeriodAndSubtype = StatsCalculator.filterRowsBySubType(runDatasetForPeriod, subType);
+    var subType = subTypeList[i];
+    var runDatasetForPeriodAndSubtype = StatsCalculator.filterRowsBySubType(runDatasetForPeriod, subType);
     stats["SubType " + subType] = StatsCalculator.calculateStatsForPeriod(runDatasetForPeriodAndSubtype, startDate, endDate);
   }
 
-  // Show overall stats
-  $('#output').jsonViewer(stats);
+  // Calculate stats for each month
+  var monthStartDates = getMonthStartDatesInPeriod(startDate, endDate);
+  var monthStats = {};
+  for (var i = 0; i < monthStartDates.length; i++) {
+    var monthStartDate = monthStartDates[i];
+    var monthEndDate = moment(monthStartDate).endOf('month');
+    var runDatasetForMonth = StatsCalculator.filterRowsByDate(analyzerApp.runsDataset, monthStartDate, monthEndDate);
+    monthStats[monthStartDate.format("MMMM YYYY")] = StatsCalculator.calculateStatsForPeriod(runDatasetForMonth, monthStartDate, monthEndDate);
+  }
+
+
+  // Show type stats and month stats
+  $('#type-stats-output').jsonViewer(stats);
+  $('#month-stats-output').jsonViewer(monthStats);
 }
 
 function readRunningAheadTSV(tsvString) {

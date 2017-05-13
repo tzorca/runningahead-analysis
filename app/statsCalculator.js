@@ -52,6 +52,11 @@ var StatsCalculator = {
     });
   },
 
+
+  getMonthStartDatesInPeriod: function (rows) {
+
+  },
+
   calculateStatsForPeriod: function (rows, startDate, endDate) {
     var runsByDate, runsWithNotes, totalAvgHeartRate, runsWithAvgHR, totalRelativeRunningEconomy, pRows = StatsCalculator.filterRowsByDate(rows, startDate, endDate), stats = {};
 
@@ -62,7 +67,7 @@ var StatsCalculator = {
 
     // Days in period
     stats[StatsKeys.Days_in_Period] = moment(endDate)
-      .diff(moment(startDate), 'days');
+      .diff(moment(startDate), 'days') + 1;
 
     // Total runs
     stats[StatsKeys.Total_Runs] = pRows.length;
