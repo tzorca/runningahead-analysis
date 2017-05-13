@@ -16,11 +16,13 @@ var StatsKeys = {
   Total_Hours_Run: "Total Hours Run",
   Average_Hours_Per_Week: "Average Hours Per Week",
   Average_Pace: "Average Pace",
+  Average_Heart_Rate: "Average Heart Rate",
   Total_Runs_with_Notes: "Total Runs with Notes",
   Total_Note_Length: "Total Note Length",
   Average_Note_Length: "Average Note Length",
   Total_Days_with_Notes: "Total Days with Notes",
-  Percent_of_Days_with_Notes: "Percent of Days with Notes"
+  Percent_of_Days_with_Notes: "Percent of Days with Notes",
+  Average_Relative_Run_Economy: "Average Relative Run Economy"
 };
 
 var StatsCalculator = {
@@ -51,7 +53,7 @@ var StatsCalculator = {
   },
 
   calculateStatsForPeriod: function (rows, startDate, endDate) {
-    var runsByDate, runsWithNotes, runsWithNotesByDate, pRows = StatsCalculator.filterRowsByDate(rows, startDate, endDate), stats = {};
+    var runsByDate, runsWithNotes, totalAvgHeartRate, runsWithAvgHR, totalRelativeRunningEconomy, runsWithNotesByDate, pRows = StatsCalculator.filterRowsByDate(rows, startDate, endDate), stats = {};
 
     // Start and end date
     stats[StatsKeys.Start_Date] = startDate.format('M/D/YYYY');
@@ -120,6 +122,20 @@ var StatsCalculator = {
     // Percent of days with notes
     stats[StatsKeys.Percent_of_Days_with_Notes] = stats[StatsKeys.Total_Days_with_Notes] / stats[StatsKeys.Days_in_Period] * 100;
 
+    // Average Heart Rate
+    runsWithAvgHR = pRows.filter(function (row) {
+      return row[OriginalHeaders.AvgHR] && row[OriginalHeaders.AvgHR] > 10;
+    });
+    totalAvgHeartRate = sumByKeyInObject(runsWithAvgHR, OriginalHeaders.AvgHR);
+    stats[StatsKeys.Average_Heart_Rate] = totalAvgHeartRate / runsWithAvgHR.length;
+
+    // Average Relative Running Economy
+    runsWithRelRunEconomy = pRows.filter(function (row) {
+      return row[AddedHeaders.RelativeRunningEconomy] && row[AddedHeaders.RelativeRunningEconomy] > 10;
+    });
+    totalRelativeRunningEconomy = sumByKeyInObject(runsWithRelRunEconomy, AddedHeaders.RelativeRunningEconomy);
+    stats[StatsKeys.Average_Relative_Run_Economy] = (totalRelativeRunningEconomy / runsWithRelRunEconomy.length);
+
     // Round for display
     stats[StatsKeys.Average_Days_Run_Per_Week] = roundFloat(stats[StatsKeys.Average_Days_Run_Per_Week], 1);
     stats[StatsKeys.Average_Runs_Per_Day_Run] = roundFloat(stats[StatsKeys.Average_Runs_Per_Day_Run], 1);
@@ -134,6 +150,8 @@ var StatsCalculator = {
     stats[StatsKeys.Average_Note_Length] = roundFloat(stats[StatsKeys.Average_Note_Length], 1);
     stats[StatsKeys.Total_Days_with_Notes] = roundFloat(stats[StatsKeys.Total_Days_with_Notes], 1);
     stats[StatsKeys.Percent_of_Days_with_Notes] = roundFloat(stats[StatsKeys.Percent_of_Days_with_Notes], 1);
+    stats[StatsKeys.Average_Heart_Rate] = roundFloat(stats[StatsKeys.Average_Heart_Rate], 1);
+    stats[StatsKeys.Average_Relative_Run_Economy] = roundFloat(stats[StatsKeys.Average_Relative_Run_Economy], 1);
 
     return stats;
   },

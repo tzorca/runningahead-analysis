@@ -22,7 +22,7 @@ function roundFloat(val, decimalPlaces) {
 function sumByKeyInObject(array, key) {
   return _.reduce(array,
     function(previous, obj) {
-      var val = obj[key];
+      var val = parseFloat(obj[key]);
       if (val) {
         return previous + val;
       } else {
