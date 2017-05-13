@@ -20,8 +20,8 @@ var StatsKeys = {
   Total_Runs_with_Notes: "Total Runs with Notes",
   Total_Note_Length: "Total Note Length",
   Average_Note_Length: "Average Note Length",
-  Total_Days_with_Notes: "Total Days with Notes",
-  Percent_of_Days_with_Notes: "Percent of Days with Notes",
+  Total_Runs_with_Notes: "Total Runs with Notes",
+  Percent_of_Runs_with_Notes: "Percent of Runs with Notes",
   Average_Relative_Run_Economy: "Average Relative Run Economy"
 };
 
@@ -53,11 +53,12 @@ var StatsCalculator = {
   },
 
   calculateStatsForPeriod: function (rows, startDate, endDate) {
-    var runsByDate, runsWithNotes, totalAvgHeartRate, runsWithAvgHR, totalRelativeRunningEconomy, runsWithNotesByDate, pRows = StatsCalculator.filterRowsByDate(rows, startDate, endDate), stats = {};
+    var runsByDate, runsWithNotes, totalAvgHeartRate, runsWithAvgHR, totalRelativeRunningEconomy, pRows = StatsCalculator.filterRowsByDate(rows, startDate, endDate), stats = {};
 
     // Start and end date
-    stats[StatsKeys.Start_Date] = startDate.format('M/D/YYYY');
-    stats[StatsKeys.End_Date] = endDate.format('M/D/YYYY');
+
+    stats[StatsKeys.Start_Date] = moment(startDate).format('M/D/YYYY');
+    stats[StatsKeys.End_Date] = moment(endDate).format('M/D/YYYY');
 
     // Days in period
     stats[StatsKeys.Days_in_Period] = moment(endDate)
@@ -112,15 +113,11 @@ var StatsCalculator = {
     // Average note length
     stats[StatsKeys.Average_Note_Length] = stats[StatsKeys.Total_Note_Length] / stats[StatsKeys.Total_Runs_with_Notes];
 
-    runsWithNotesByDate = _.groupBy(runsWithNotes, function (row) {
-      return row.Date;
-    });
-
     // Total days with notes
-    stats[StatsKeys.Total_Days_with_Notes] = Object.keys(runsWithNotesByDate).length;
+    stats[StatsKeys.Total_Runs_with_Notes] = runsWithNotes.length;
 
     // Percent of days with notes
-    stats[StatsKeys.Percent_of_Days_with_Notes] = stats[StatsKeys.Total_Days_with_Notes] / stats[StatsKeys.Days_in_Period] * 100;
+    stats[StatsKeys.Percent_of_Runs_with_Notes] = stats[StatsKeys.Total_Runs_with_Notes] / stats[StatsKeys.Total_Runs] * 100;
 
     // Average Heart Rate
     runsWithAvgHR = pRows.filter(function (row) {
@@ -148,8 +145,8 @@ var StatsCalculator = {
     stats[StatsKeys.Total_Runs_with_Notes] = roundFloat(stats[StatsKeys.Total_Runs_with_Notes], 1);
     stats[StatsKeys.Total_Note_Length] = roundFloat(stats[StatsKeys.Total_Note_Length], 1);
     stats[StatsKeys.Average_Note_Length] = roundFloat(stats[StatsKeys.Average_Note_Length], 1);
-    stats[StatsKeys.Total_Days_with_Notes] = roundFloat(stats[StatsKeys.Total_Days_with_Notes], 1);
-    stats[StatsKeys.Percent_of_Days_with_Notes] = roundFloat(stats[StatsKeys.Percent_of_Days_with_Notes], 1);
+    stats[StatsKeys.Total_Runs_with_Notes] = roundFloat(stats[StatsKeys.Total_Runs_with_Notes], 1);
+    stats[StatsKeys.Percent_of_Runs_with_Notes] = roundFloat(stats[StatsKeys.Percent_of_Runs_with_Notes], 1);
     stats[StatsKeys.Average_Heart_Rate] = roundFloat(stats[StatsKeys.Average_Heart_Rate], 1);
     stats[StatsKeys.Average_Relative_Run_Economy] = roundFloat(stats[StatsKeys.Average_Relative_Run_Economy], 1);
 
